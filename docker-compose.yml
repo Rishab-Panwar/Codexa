@@ -1,11 +1,41 @@
-﻿services:
-  codexa:
+services:
+  backend:
     build: .
-    ports:
-      - "8000:8000"
-    environment:
-      CODEXA_AUTH_ENABLED: "false"
-      CODEXA_EMBEDDING_PROVIDER: "sentence"
-      CODEXA_LLM_PROVIDER: "openai"
+    env_file:
+      - ./infra/backend.env
     volumes:
-      - ./.codexa:/app/.codexa
+      - codexa_data:/app/.codexa
+    expose:
+      - "8000"
+    restart: always
+
+  client:
+    build:
+      context: ./codexa-ui
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    expose:
+      - "3000"
+    restart: always
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    env_file:
+      - ./infra/caddy.env
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+      - client
+    restart: always
+
+volumes:
+  codexa_data:
+  caddy_data:
+  caddy_config:
