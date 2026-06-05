@@ -13,7 +13,3 @@ ignore = ["E501", "B008", "B904", "B905", "N806", "SIM108", "E402", "W291"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["codexa"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-asyncio_mode = "auto"
