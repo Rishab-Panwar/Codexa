@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends
 
 from codexa.app.di import get_repo_state_store
 from codexa.observability.tracker import tracker

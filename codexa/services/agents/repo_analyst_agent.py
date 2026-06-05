@@ -1,4 +1,4 @@
-﻿from langchain_core.language_models import BaseChatModel
+from langchain_core.language_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 
 from codexa.services.agents.interfaces import Agent

@@ -1,4 +1,4 @@
-﻿from codexa.services.agents.interfaces import Agent
+from codexa.services.agents.interfaces import Agent
 from codexa.services.qa.answer_service import AnswerService
 
 

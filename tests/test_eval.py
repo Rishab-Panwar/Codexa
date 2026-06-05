@@ -1,4 +1,4 @@
-﻿from codexa.models.embedding_record import EmbeddingRecord
+from codexa.models.embedding_record import EmbeddingRecord
 from codexa.services.eval.basic_eval import EvalQuery, evaluate_retrieval
 from codexa.services.retrieval.embedding import EmbeddingService
 from codexa.services.retrieval.interfaces import CodeRetriever

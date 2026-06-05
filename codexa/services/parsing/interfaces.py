@@ -1,4 +1,4 @@
-﻿from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod
 
 from codexa.models.parsed_repository import ParsedRepository
 from codexa.models.repository import Repository

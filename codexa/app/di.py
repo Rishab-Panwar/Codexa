@@ -1,4 +1,4 @@
-﻿from functools import lru_cache
+from functools import lru_cache
 from pathlib import Path
 
 from codexa.services.agents.coding_mentor_agent import CodingMentorAgent

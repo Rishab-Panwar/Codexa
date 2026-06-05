@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 from pathlib import Path
 
 from codexa.models.embedding_record import EmbeddingRecord

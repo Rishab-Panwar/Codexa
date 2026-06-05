@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 
 from codexa.models.embedding_record import EmbeddingRecord
 from codexa.services.qa.answer_service import AnswerService

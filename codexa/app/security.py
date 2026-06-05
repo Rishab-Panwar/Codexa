@@ -1,4 +1,4 @@
-﻿from fastapi import Header, HTTPException
+from fastapi import Header, HTTPException
 
 from codexa.utils.config import AppConfig
 

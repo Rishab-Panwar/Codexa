@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends
 
 from codexa.app.di import get_explain_service
 from codexa.schemas.explain import ExplainRequest, ExplainResponse

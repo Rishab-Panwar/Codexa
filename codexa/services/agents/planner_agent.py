@@ -1,4 +1,4 @@
-﻿import json
+import json
 
 from langchain_core.language_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate

@@ -1,4 +1,4 @@
-﻿from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod
 
 from codexa.models.embedding_record import EmbeddingRecord
 

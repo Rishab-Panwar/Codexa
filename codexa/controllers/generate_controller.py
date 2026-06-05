@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends
 
 from codexa.app.di import get_agent_orchestrator
 from codexa.schemas.generate import GenerateCodeRequest, GenerateCodeResponse

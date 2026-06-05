@@ -1,4 +1,4 @@
-﻿from dataclasses import dataclass
+from dataclasses import dataclass
 
 from codexa.services.retrieval.embedding import EmbeddingService
 from codexa.services.retrieval.interfaces import CodeRetriever

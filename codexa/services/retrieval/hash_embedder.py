@@ -1,4 +1,4 @@
-﻿import hashlib
+import hashlib
 import re
 from math import sqrt
 

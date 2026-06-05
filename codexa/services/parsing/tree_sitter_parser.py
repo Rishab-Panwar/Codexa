@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 from pathlib import Path
 
 from tree_sitter import Node

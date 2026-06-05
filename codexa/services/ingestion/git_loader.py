@@ -1,4 +1,4 @@
-﻿import re
+import re
 import subprocess
 import uuid
 from datetime import UTC, datetime

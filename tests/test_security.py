@@ -1,4 +1,4 @@
-﻿import pytest
+import pytest
 from fastapi import HTTPException
 
 from codexa.app.security import verify_api_key

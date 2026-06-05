@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends
 
 from codexa.app.di import (
     get_ast_parser,

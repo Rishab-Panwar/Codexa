@@ -1,4 +1,4 @@
-﻿from prometheus_client import Counter, Histogram
+from prometheus_client import Counter, Histogram
 
 REQUEST_COUNT = Counter(
     "codexa_request_total",

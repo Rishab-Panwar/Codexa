@@ -1,4 +1,4 @@
-﻿from datetime import datetime
+from datetime import datetime
 
 from codexa.models.agent_memory import AgentMemory
 from codexa.services.agents.interfaces import Agent

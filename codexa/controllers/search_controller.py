@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends
 
 from codexa.app.di import get_code_retriever, get_embedder
 from codexa.schemas.search import SearchHit, SearchRequest, SearchResponse
