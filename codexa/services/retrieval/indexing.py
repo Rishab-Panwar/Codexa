@@ -19,8 +19,18 @@ class CodeIndexService:
         documents: list[str] = []
         records: list[EmbeddingRecord] = []
 
+        # Index a whole-file record only for files that have no parsed functions
+        # (configs, scripts, etc). Files with functions are covered by the
+        # per-function snippets below — embedding both is redundant and slow.
+        files_with_functions = {function.file_path for function in parsed_repo.functions}
         for source_file in parsed_repo.files:
+            if source_file.path in files_with_functions:
+                continue
+            if _is_skippable(source_file.path):
+                continue
             content = _safe_read(Path(source_file.path))
+            if not content.strip():
+                continue
             documents.append(content)
             records.append(
                 EmbeddingRecord(
@@ -63,6 +73,30 @@ class CodeIndexService:
 
         self._retriever.index(repository.repo_id, indexed_records)
         self._logger.info("Indexed %s records for repo %s", len(indexed_records), repository.repo_id)
+
+
+# Files that add noise/bloat to the index without improving code understanding.
+_SKIP_NAME_SUFFIXES = (
+    ".lock",
+    ".min.js",
+    ".min.css",
+    ".map",
+    "-lock.json",
+    "package-lock.json",
+)
+_MAX_FILE_BYTES = 200_000  # skip very large/generated blobs
+
+
+def _is_skippable(path_str: str) -> bool:
+    lower = path_str.lower()
+    if any(lower.endswith(suffix) for suffix in _SKIP_NAME_SUFFIXES):
+        return True
+    try:
+        if Path(path_str).stat().st_size > _MAX_FILE_BYTES:
+            return True
+    except OSError:
+        return True
+    return False
 
 
 def _safe_read(path: Path) -> str:

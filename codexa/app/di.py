@@ -15,7 +15,9 @@ from codexa.services.memory.json_store import JsonMemoryStore
 from codexa.services.parsing.tree_sitter_parser import TreeSitterAstParser
 from codexa.services.qa.answer_service import AnswerService
 from codexa.services.qa.explain_service import CodeExplainService
+from codexa.services.retrieval.embedding import EmbeddingService
 from codexa.services.retrieval.faiss_retriever import FaissCodeRetriever
+from codexa.services.retrieval.fastembed_embedder import FastEmbedEmbeddingService
 from codexa.services.retrieval.hash_embedder import HashEmbeddingService
 from codexa.services.retrieval.indexing import CodeIndexService
 from codexa.services.retrieval.sentence_transformer_embedder import (
@@ -47,11 +49,15 @@ def get_code_retriever() -> FaissCodeRetriever:
 
 
 @lru_cache
-def get_embedder() -> SentenceTransformerEmbeddingService | HashEmbeddingService:
+def get_embedder() -> EmbeddingService:
     config = get_config()
-    if config.embedding_provider == "hash":
+    provider = config.embedding_provider
+    if provider == "hash":
         return HashEmbeddingService()
-    return SentenceTransformerEmbeddingService(model_name=config.embedding_model)
+    if provider == "sentence":
+        return SentenceTransformerEmbeddingService(model_name=config.embedding_model)
+    # Default: fastembed (quantized ONNX all-MiniLM) — fast on CPU, light on RAM.
+    return FastEmbedEmbeddingService()
 
 
 @lru_cache

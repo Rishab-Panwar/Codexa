@@ -10,5 +10,6 @@ tree-sitter-languages==1.10.2
 langchain-openai==0.1.22
 langchain-community==0.2.12
 sentence-transformers==3.4.1
+fastembed==0.4.2
 prometheus-client==0.20.0
 python-dotenv==1.0.1
