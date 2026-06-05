@@ -1,0 +1,25 @@
+﻿services:
+  codexa:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      CODEXA_AUTH_ENABLED: "false"
+      CODEXA_EMBEDDING_PROVIDER: "sentence"
+      CODEXA_LLM_PROVIDER: "openai"
+    volumes:
+      - ./.codexa:/app/.codexa
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./ops/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus

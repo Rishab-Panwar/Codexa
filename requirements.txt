@@ -1,0 +1,14 @@
+fastapi==0.115.5
+uvicorn==0.30.6
+pydantic==2.8.2
+networkx==3.3
+langchain==0.2.14
+langgraph==0.2.24
+faiss-cpu==1.14.2
+tree-sitter==0.21.3
+tree-sitter-languages==1.10.2
+langchain-openai==0.1.22
+langchain-community==0.2.12
+sentence-transformers==3.4.1
+prometheus-client==0.20.0
+python-dotenv==1.0.1

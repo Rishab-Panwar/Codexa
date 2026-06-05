@@ -1,0 +1,11 @@
+﻿services:
+  codexa:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      CODEXA_AUTH_ENABLED: "false"
+      CODEXA_EMBEDDING_PROVIDER: "sentence"
+      CODEXA_LLM_PROVIDER: "openai"
+    volumes:
+      - ./.codexa:/app/.codexa
