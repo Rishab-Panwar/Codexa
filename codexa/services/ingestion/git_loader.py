@@ -21,10 +21,10 @@ class GitRepositoryLoader(RepositoryLoader):
         self.base_dir = Path(base_dir or ".codexa/repos").resolve()
         self.base_dir.mkdir(parents=True, exist_ok=True)
 
-    def load(self, repo_url: str) -> Repository:
+    def load(self, repo_url: str, repo_id: str | None = None) -> Repository:
         repo_url_str = str(repo_url)
         clone_url = _normalize_repo_url(repo_url_str)
-        repo_id = str(uuid.uuid4())
+        repo_id = repo_id or str(uuid.uuid4())
         repo_dir = self.base_dir / repo_id
         self._clone(clone_url, repo_dir)
         name = clone_url.rstrip("/").rstrip(".git").split("/")[-1]
