@@ -45,6 +45,7 @@ def _run_full_analysis(
         index_service.index_repository(repo, parsed)
     except Exception as e:
         import logging
+
         logging.getLogger(__name__).error("Analysis failed for %s: %s", repo_url, e)
 
 
