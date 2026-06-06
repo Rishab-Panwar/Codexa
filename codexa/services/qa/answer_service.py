@@ -10,6 +10,8 @@ from codexa.models.embedding_record import EmbeddingRecord
 from codexa.services.retrieval.embedding import EmbeddingService
 from codexa.services.retrieval.interfaces import CodeRetriever
 
+_MAX_SNIPPET_CHARS = 1500
+
 
 def _clean_display_path(raw_path: str) -> str:
     """Strip .codexa/repos/<uuid>/ prefix so users see clean relative paths."""
@@ -73,6 +75,16 @@ class AnswerService:
             reasoning_steps=reasoning,
         )
 
+    def retrieve_context(self, repo_id: str, question: str, top_k: int = 5) -> tuple[str, list[str]]:
+        """Embed + search + rerank only (no LLM call). Returns (context, citations)."""
+        query_vector = self._embedder.embed_query(question)
+        records = self._retriever.search(repo_id, query_vector, max(top_k, 10))
+        records = self._rerank(question, records)[:top_k]
+        self._logger.info("Retrieved %s records for repo %s", len(records), repo_id)
+        citations = [self._citation_text(record) for record in records]
+        context = self._build_context(records) if records else ""
+        return context, citations
+
     def _format_answer(self, question: str, records: list[EmbeddingRecord]) -> list[str]:
         if not records:
             return [
@@ -122,6 +134,9 @@ class AnswerService:
         for record in records:
             display_path = _clean_display_path(record.metadata.get("path", ""))
             snippet = _record_snippet(record)
+            # Cap each snippet so whole-file records don't bloat the LLM prompt.
+            if len(snippet) > _MAX_SNIPPET_CHARS:
+                snippet = snippet[:_MAX_SNIPPET_CHARS] + "\n... (truncated)"
             chunks.append(f"[{display_path}]\n{snippet}")
         return "\n\n".join(chunks)
 

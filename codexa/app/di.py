@@ -109,6 +109,7 @@ def get_agent_orchestrator() -> AgentOrchestrator:
         mentor_agent=mentor_agent,
         memory_agent=memory_agent,
         memory_store=memory_store,
+        answer_service=answer_service,
     )
 
 

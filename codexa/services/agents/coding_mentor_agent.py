@@ -25,6 +25,13 @@ class CodingMentorAgent(Agent):
             ]
         )
 
+    def generate(self, goal: str, context: str) -> str:
+        """Single LLM call using pre-retrieved context (no internal retrieval)."""
+        context_str = context if context.strip() else "No relevant code found in the repository index."
+        chain = self._prompt | self._llm
+        response = chain.invoke({"goal": goal, "context": context_str})
+        return response.content
+
     def run(self, prompt: str, repo_id: str | None = None) -> str:
         if not repo_id:
             return "Error: repo_id is required for coding assistance."

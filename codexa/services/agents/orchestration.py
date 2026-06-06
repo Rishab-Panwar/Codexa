@@ -30,6 +30,7 @@ class AgentOrchestrator:
         mentor_agent: Agent,
         memory_agent: Agent,
         memory_store: MemoryStore | None = None,
+        answer_service=None,
     ) -> None:
         self._planner = planner
         self._retrieval_agent = retrieval_agent
@@ -37,6 +38,7 @@ class AgentOrchestrator:
         self._mentor_agent = mentor_agent
         self._memory_agent = memory_agent
         self._memory_store = memory_store
+        self._answer_service = answer_service
         self._logger = logging.getLogger(__name__)
 
         self._graph = self._build_graph()
@@ -65,19 +67,17 @@ class AgentOrchestrator:
         )
 
     def handle_question_fast(self, question: str, repo_id: str) -> AnswerResult:
-        """Faster path: skip planner & validator, go straight retrieval → mentor."""
-        # 1. Retrieve
+        """Faster path: one retrieval (no LLM) + one mentor LLM call."""
+        # 1. Retrieve context + citations (embed + search only, no LLM)
         try:
-            retrieval_output = self._retrieval_agent.run(question, repo_id)
+            context, citations = self._answer_service.retrieve_context(repo_id, question)
         except Exception as e:
             self._logger.warning("Retrieval failed: %s", e)
-            retrieval_output = ""
-        citations = self._parse_citations_from_retrieval_output(retrieval_output)
+            context, citations = "", []
 
-        # 2. Mentor answers using context
-        mentor_prompt = f"{question}\n\nRetrieved context:\n{retrieval_output}" if retrieval_output else question
+        # 2. Single mentor LLM call grounded in that context
         try:
-            answer = self._mentor_agent.run(mentor_prompt, repo_id)
+            answer = self._mentor_agent.generate(question, context)
         except Exception as e:
             self._logger.warning("Mentor failed: %s", e)
             answer = f"Error generating answer: {e}"
@@ -86,7 +86,7 @@ class AgentOrchestrator:
             answer=answer,
             citations=citations,
             reasoning_steps=[
-                "Fast mode: retrieval + mentor (skipped planner & validator).",
+                "Fast mode: 1 retrieval + 1 mentor call (skipped planner & validator).",
                 f"Retrieved {len(citations)} citations.",
             ],
         )
