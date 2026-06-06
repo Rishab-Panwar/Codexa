@@ -24,6 +24,7 @@ from codexa.services.retrieval.indexing import CodeIndexService
 from codexa.services.retrieval.sentence_transformer_embedder import (
     SentenceTransformerEmbeddingService,
 )
+from codexa.services.retrieval.voyage_embedder import VoyageEmbeddingService
 from codexa.services.state.index_status import IndexStatusRegistry
 from codexa.services.state.repo_state_store import RepoStateStore
 from codexa.utils.config import AppConfig, load_config
@@ -60,6 +61,8 @@ def get_embedder() -> EmbeddingService:
         return SentenceTransformerEmbeddingService(model_name=config.embedding_model)
     if provider == "gemini":
         return GeminiEmbeddingService()
+    if provider == "voyage":
+        return VoyageEmbeddingService()
     # Default: fastembed (quantized ONNX all-MiniLM) — fast on CPU, light on RAM.
     return FastEmbedEmbeddingService()
 

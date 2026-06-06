@@ -17,7 +17,7 @@ class AppConfig:
 
 def load_config() -> AppConfig:
     return AppConfig(
-        embedding_provider=os.getenv("CODEXA_EMBEDDING_PROVIDER", "sentence"),
+        embedding_provider=os.getenv("CODEXA_EMBEDDING_PROVIDER", "fastembed"),
         embedding_model=os.getenv("CODEXA_EMBEDDING_MODEL", "all-MiniLM-L6-v2"),
         index_dir=os.getenv("CODEXA_INDEX_DIR", ".codexa/indexes"),
         state_dir=os.getenv("CODEXA_STATE_DIR", ".codexa/state"),

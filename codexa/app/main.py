@@ -58,6 +58,24 @@ def create_app() -> FastAPI:
     app.include_router(eval_router, dependencies=[auth_dependency])
     app.include_router(metrics_router)
 
+    @app.on_event("startup")
+    def _warm_embedder() -> None:
+        # Load the embedding model in the background so the first index doesn't
+        # pay the one-time model-load cost. No-op for the hash provider.
+        import logging
+        import threading
+
+        def warm() -> None:
+            try:
+                from codexa.app.di import get_embedder
+
+                get_embedder().embed_query("warmup")
+                logging.getLogger(__name__).info("Embedder warmed up.")
+            except Exception as e:
+                logging.getLogger(__name__).warning("Embedder warmup skipped: %s", e)
+
+        threading.Thread(target=warm, daemon=True).start()
+
     @app.middleware("http")
     async def record_metrics(request, call_next):
         from time import perf_counter
