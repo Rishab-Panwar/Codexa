@@ -91,6 +91,18 @@ class AgentOrchestrator:
             ],
         )
 
+    def prepare_fast_context(self, question: str, repo_id: str) -> tuple[str, list[str]]:
+        """Retrieve context + citations (no LLM) for streaming."""
+        try:
+            return self._answer_service.retrieve_context(repo_id, question)
+        except Exception as e:
+            self._logger.warning("Retrieval failed: %s", e)
+            return "", []
+
+    def stream_answer_fast(self, question: str, context: str):
+        """Yield answer tokens from the mentor using pre-retrieved context."""
+        return self._mentor_agent.stream(question, context)
+
     def handle_generation(self, prompt: str, repo_id: str) -> GenerateResult:
         """Generate code or example usage grounded in repo context."""
         # 1. Retrieve relevant context and citations

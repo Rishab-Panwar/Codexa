@@ -108,41 +108,37 @@ async def ask_stream(
                     }
                 )
             else:
-                # ---- Repo mode: fast path (retrieval → mentor, no planner/validator) ----
+                # ---- Repo mode: retrieve context (no LLM), then stream mentor tokens ----
                 yield _sse({"type": "status", "content": "Retrieving context..."})
 
                 loop = asyncio.get_event_loop()
-                result = await loop.run_in_executor(
+                context, citations = await loop.run_in_executor(
                     None,
-                    lambda: orchestrator.handle_question_fast(request.question, request.repo_id),
+                    lambda: orchestrator.prepare_fast_context(request.question, request.repo_id),
                 )
 
                 yield _sse({"type": "status", "content": "Streaming answer..."})
 
-                # Stream answer in small chunks for natural feel
-                answer = result.answer
-                chunk_size = 4  # words per chunk
-                words = answer.split(" ")
-                for i in range(0, len(words), chunk_size):
-                    chunk = " ".join(words[i : i + chunk_size])
-                    if i + chunk_size < len(words):
-                        chunk += " "
-                    yield _sse({"type": "token", "content": chunk})
-                    await asyncio.sleep(0.008)
+                # Real token streaming from the LLM as it generates.
+                for token in orchestrator.stream_answer_fast(request.question, context):
+                    yield _sse({"type": "token", "content": token})
 
                 latency = (time.perf_counter() - start) * 1000
                 tracker.record_query(
                     question=request.question,
                     repo_id=request.repo_id,
                     latency_ms=latency,
-                    citation_count=len(result.citations),
+                    citation_count=len(citations),
                     agents_used=["retrieval", "mentor"],
                 )
                 yield _sse(
                     {
                         "type": "done",
-                        "citations": result.citations,
-                        "reasoning_steps": result.reasoning_steps,
+                        "citations": citations,
+                        "reasoning_steps": [
+                            "Fast mode: 1 retrieval + streamed mentor answer.",
+                            f"Retrieved {len(citations)} citations.",
+                        ],
                     }
                 )
         except Exception as e:

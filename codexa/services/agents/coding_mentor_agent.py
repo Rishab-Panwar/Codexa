@@ -32,6 +32,15 @@ class CodingMentorAgent(Agent):
         response = chain.invoke({"goal": goal, "context": context_str})
         return response.content
 
+    def stream(self, goal: str, context: str):
+        """Stream the answer token-by-token using pre-retrieved context."""
+        context_str = context if context.strip() else "No relevant code found in the repository index."
+        chain = self._prompt | self._llm
+        for chunk in chain.stream({"goal": goal, "context": context_str}):
+            token = chunk.content if hasattr(chunk, "content") else str(chunk)
+            if token:
+                yield token
+
     def run(self, prompt: str, repo_id: str | None = None) -> str:
         if not repo_id:
             return "Error: repo_id is required for coding assistance."
