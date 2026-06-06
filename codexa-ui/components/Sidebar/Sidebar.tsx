@@ -15,7 +15,14 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import RepoTree from "./RepoTree";
-import { listRepos, indexRepository, RepoInfo } from "@/lib/api";
+import { listRepos, indexRepository, fetchIndexStatus, RepoInfo } from "@/lib/api";
+
+const STAGE_LABELS: Record<string, string> = {
+    queued: "Queued...",
+    cloning: "Cloning...",
+    parsing: "Parsing...",
+    embedding: "Embedding...",
+};
 
 export default function Sidebar() {
     const [repos, setRepos] = useState<RepoInfo[]>([]);
@@ -25,6 +32,7 @@ export default function Sidebar() {
     const [newRepoUrl, setNewRepoUrl] = useState("");
     const [isIndexing, setIsIndexing] = useState(false);
     const [indexError, setIndexError] = useState<string | null>(null);
+    const [indexStage, setIndexStage] = useState<string>("");
     const [treeKey, setTreeKey] = useState(0);
 
     useEffect(() => {
@@ -47,23 +55,55 @@ export default function Sidebar() {
         if (!newRepoUrl.trim() || isIndexing) return;
         setIndexError(null);
         setIsIndexing(true);
+        setIndexStage("Queued...");
+        const url = newRepoUrl.trim();
         try {
-            const result = await indexRepository(newRepoUrl.trim());
-            if (result?.repository_id) {
-                const repoName = newRepoUrl.trim().replace(/\/$/, "").split("/").pop() || result.repository_id;
-                setRepos((prev) =>
-                    prev.some((r) => r.repo_id === result.repository_id)
-                        ? prev
-                        : [...prev, { repo_id: result.repository_id, name: repoName }]
-                );
-                switchRepo(result.repository_id);
-                setNewRepoUrl("");
-                setShowAddForm(false);
-            }
+            const result = await indexRepository(url);
+            const repoId = result?.repository_id;
+            if (!repoId) throw new Error("Backend did not return a repository id.");
+            const repoName = url.replace(/\/$/, "").split("/").pop() || repoId;
+
+            // Poll real status until ready/failed before switching (else the
+            // explorer loads before the repo is cloned -> "Error loading explorer").
+            const startedAt = Date.now();
+            await new Promise<void>((resolve, reject) => {
+                const poll = setInterval(async () => {
+                    try {
+                        const status = await fetchIndexStatus(repoId);
+                        if (status.status === "ready") {
+                            clearInterval(poll);
+                            if ((status.record_count ?? 0) === 0) {
+                                reject(new Error("Indexed, but no code on the default branch."));
+                                return;
+                            }
+                            resolve();
+                        } else if (status.status === "failed") {
+                            clearInterval(poll);
+                            reject(new Error(status.error || "Indexing failed."));
+                        } else {
+                            setIndexStage(STAGE_LABELS[status.stage || "queued"] || "Indexing...");
+                        }
+                    } catch {
+                        /* transient — keep polling */
+                    }
+                    if (Date.now() - startedAt > 5 * 60 * 1000) {
+                        clearInterval(poll);
+                        reject(new Error("Indexing timed out."));
+                    }
+                }, 1500);
+            });
+
+            setRepos((prev) =>
+                prev.some((r) => r.repo_id === repoId) ? prev : [...prev, { repo_id: repoId, name: repoName }]
+            );
+            switchRepo(repoId);
+            setNewRepoUrl("");
+            setShowAddForm(false);
         } catch (err: any) {
             setIndexError(err.message || "Failed to index repository.");
         } finally {
             setIsIndexing(false);
+            setIndexStage("");
         }
     };
 
@@ -274,7 +314,11 @@ export default function Sidebar() {
                                 disabled={!newRepoUrl.trim() || isIndexing}
                                 className="flex-1 flex items-center justify-center gap-1 px-2 py-1 bg-accent text-background rounded text-[10px] font-bold hover:opacity-90 disabled:opacity-50"
                             >
-                                {isIndexing ? <Loader2 className="w-3 h-3 animate-spin" /> : <>Index <ArrowRight className="w-3 h-3" /></>}
+                                {isIndexing ? (
+                                    <><Loader2 className="w-3 h-3 animate-spin" /> {indexStage || "Indexing..."}</>
+                                ) : (
+                                    <>Index <ArrowRight className="w-3 h-3" /></>
+                                )}
                             </button>
                             <button
                                 onClick={() => { setShowAddForm(false); setIndexError(null); }}
