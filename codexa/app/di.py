@@ -18,6 +18,7 @@ from codexa.services.qa.explain_service import CodeExplainService
 from codexa.services.retrieval.embedding import EmbeddingService
 from codexa.services.retrieval.faiss_retriever import FaissCodeRetriever
 from codexa.services.retrieval.fastembed_embedder import FastEmbedEmbeddingService
+from codexa.services.retrieval.gemini_embedder import GeminiEmbeddingService
 from codexa.services.retrieval.hash_embedder import HashEmbeddingService
 from codexa.services.retrieval.indexing import CodeIndexService
 from codexa.services.retrieval.sentence_transformer_embedder import (
@@ -57,6 +58,8 @@ def get_embedder() -> EmbeddingService:
         return HashEmbeddingService()
     if provider == "sentence":
         return SentenceTransformerEmbeddingService(model_name=config.embedding_model)
+    if provider == "gemini":
+        return GeminiEmbeddingService()
     # Default: fastembed (quantized ONNX all-MiniLM) — fast on CPU, light on RAM.
     return FastEmbedEmbeddingService()
 
