@@ -38,6 +38,11 @@ class RepoStateStore:
     def list_repo_ids(self) -> list[str]:
         return sorted(self._states.keys())
 
+    def delete(self, repo_id: str) -> None:
+        self._states.pop(repo_id, None)
+        if self._base_dir:
+            (self._base_dir / f"{repo_id}.json").unlink(missing_ok=True)
+
     def _persist(self, repo_id: str, state: RepoState) -> None:
         if not self._base_dir:
             return

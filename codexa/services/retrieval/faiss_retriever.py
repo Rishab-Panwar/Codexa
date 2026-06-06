@@ -50,6 +50,12 @@ class FaissCodeRetriever(CodeRetriever):
         repo_index = self._indexes.get(repo_id)
         return len(repo_index.records) if repo_index else 0
 
+    def delete(self, repo_id: str) -> None:
+        self._indexes.pop(repo_id, None)
+        if self._base_dir:
+            (self._base_dir / f"{repo_id}.faiss").unlink(missing_ok=True)
+            (self._base_dir / f"{repo_id}.pkl").unlink(missing_ok=True)
+
     def _persist(self, repo_id: str) -> None:
         if not self._base_dir:
             return

@@ -21,3 +21,7 @@ class IndexStatusRegistry:
         with self._lock:
             entry = self._status.get(repo_id)
             return dict(entry) if entry else None
+
+    def clear(self, repo_id: str) -> None:
+        with self._lock:
+            self._status.pop(repo_id, None)

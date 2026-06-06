@@ -1,10 +1,10 @@
 "use client";
 
-import { Github, ArrowRight, Loader2, Search, Database, Code2, FolderOpen } from "lucide-react";
+import { Github, ArrowRight, Loader2, Search, Database, Code2, FolderOpen, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import { indexRepository, listRepos, fetchIndexStatus, RepoInfo } from "@/lib/api";
+import { indexRepository, listRepos, fetchIndexStatus, deleteRepo, RepoInfo } from "@/lib/api";
 
 const STAGE_LABELS: Record<string, string> = {
   queued: "Queued for indexing...",
@@ -19,6 +19,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [statusLabel, setStatusLabel] = useState("Connecting to backend...");
   const [existingRepos, setExistingRepos] = useState<RepoInfo[]>([]);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -30,6 +31,24 @@ export default function Home() {
   const openExistingRepo = (repoId: string) => {
     localStorage.setItem("current_repo_id", repoId);
     router.push("/workspace");
+  };
+
+  const handleDelete = async (e: React.MouseEvent, repoId: string) => {
+    e.stopPropagation();
+    if (!confirm("Delete this repository and its index? This cannot be undone.")) return;
+    setDeletingId(repoId);
+    try {
+      await deleteRepo(repoId);
+      setExistingRepos((repos) => repos.filter((r) => r.repo_id !== repoId));
+      if (localStorage.getItem("current_repo_id") === repoId) {
+        localStorage.removeItem("current_repo_id");
+        localStorage.removeItem("current_repo_name");
+      }
+    } catch {
+      setError("Failed to delete repository.");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const goToWorkspace = (repoId: string) => {
@@ -160,15 +179,26 @@ export default function Home() {
 
                 <div className="space-y-1.5 max-h-40 overflow-y-auto">
                   {existingRepos.map((repo) => (
-                    <button
+                    <div
                       key={repo.repo_id}
                       onClick={() => openExistingRepo(repo.repo_id)}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-[12px] mono text-muted hover:text-accent bg-white/[0.03] hover:bg-white/[0.06] rounded border border-white/5 transition-colors text-left"
+                      className="group w-full flex items-center gap-2 px-3 py-2 text-[12px] mono text-muted hover:text-accent bg-white/[0.03] hover:bg-white/[0.06] rounded border border-white/5 transition-colors text-left cursor-pointer"
                     >
                       <FolderOpen className="w-3.5 h-3.5 flex-shrink-0" />
                       <span className="truncate">{repo.name}</span>
-                      <ArrowRight className="w-3 h-3 ml-auto flex-shrink-0 opacity-0 group-hover:opacity-100" />
-                    </button>
+                      <button
+                        onClick={(e) => handleDelete(e, repo.repo_id)}
+                        disabled={deletingId === repo.repo_id}
+                        title="Delete repository"
+                        className="ml-auto flex-shrink-0 text-muted/40 hover:text-red-500 transition-colors disabled:opacity-50"
+                      >
+                        {deletingId === repo.repo_id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
                   ))}
                 </div>
               </>

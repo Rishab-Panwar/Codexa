@@ -165,6 +165,11 @@ export async function listRepos(): Promise<{ repo_ids: string[]; repos: RepoInfo
     return response.json();
 }
 
+export async function deleteRepo(repoId: string): Promise<void> {
+    const response = await fetch(`${BASE_URL}/repos/${repoId}`, { method: "DELETE" });
+    if (!response.ok) throw new Error("Failed to delete repository");
+}
+
 export async function fetchDependencyGraph(repoId: string) {
     const response = await fetch(`${BASE_URL}/dependencies/graph`, {
         method: "POST",
