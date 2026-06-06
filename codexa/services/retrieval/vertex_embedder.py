@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 try:
     from google import genai  # type: ignore
@@ -22,6 +23,7 @@ _MAX_RETRIES = 5
 _CHARS_PER_TOKEN = 3
 _MAX_REQUEST_TOKENS = 18000
 _MAX_TEXT_TOKENS = 2000
+_CONCURRENCY = 8  # parallel embed requests (retry/backoff handles any throttling)
 
 
 class VertexEmbeddingService(EmbeddingService):
@@ -71,21 +73,29 @@ class VertexEmbeddingService(EmbeddingService):
     def embed_texts(self, texts: list[str]) -> list[list[float]]:
         if not texts:
             return []
-        vectors: list[list[float]] = []
+        # Split into token-bounded batches, then embed them concurrently
+        # (preserving order) so ~50 requests don't run one-after-another.
+        batches: list[list[str]] = []
         batch: list[str] = []
         batch_tokens = 0
         for text in texts:
             snippet = _truncate(text if text.strip() else " ")
             est = max(len(snippet) // _CHARS_PER_TOKEN, 1)
-            # Flush before exceeding the per-request token budget or text count.
             if batch and (batch_tokens + est > _MAX_REQUEST_TOKENS or len(batch) >= _BATCH):
-                vectors.extend(self._embed_batch(batch))
+                batches.append(batch)
                 batch, batch_tokens = [], 0
             batch.append(snippet)
             batch_tokens += est
         if batch:
-            vectors.extend(self._embed_batch(batch))
-        return vectors
+            batches.append(batch)
+
+        self._get_client()  # init once before threads to avoid a lazy-init race
+        results: list[list[list[float]]] = [[] for _ in batches]
+        with ThreadPoolExecutor(max_workers=_CONCURRENCY) as executor:
+            future_to_idx = {executor.submit(self._embed_batch, b): i for i, b in enumerate(batches)}
+            for future in as_completed(future_to_idx):
+                results[future_to_idx[future]] = future.result()
+        return [vector for batch_result in results for vector in batch_result]
 
     def embed_query(self, text: str) -> list[float]:
         resp = self._embed_with_retry([_truncate(text if text.strip() else " ")], "RETRIEVAL_QUERY")
