@@ -1,17 +1,23 @@
 "use client";
 
 import { Github, ArrowRight, Loader2, Search, Database, Code2, FolderOpen } from "lucide-react";
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import { indexRepository, listRepos, RepoInfo } from "@/lib/api";
+import { indexRepository, listRepos, fetchIndexStatus, RepoInfo } from "@/lib/api";
+
+const STAGE_LABELS: Record<string, string> = {
+  queued: "Queued for indexing...",
+  cloning: "Cloning repository...",
+  parsing: "Parsing AST nodes...",
+  embedding: "Generating vector embeddings...",
+};
 
 export default function Home() {
   const [isIndexing, setIsIndexing] = useState(false);
   const [repoUrl, setRepoUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [step, setStep] = useState(0);
+  const [statusLabel, setStatusLabel] = useState("Connecting to backend...");
   const [existingRepos, setExistingRepos] = useState<RepoInfo[]>([]);
   const router = useRouter();
 
@@ -26,56 +32,63 @@ export default function Home() {
     router.push("/workspace");
   };
 
+  const goToWorkspace = (repoId: string) => {
+    localStorage.setItem("current_repo_id", repoId);
+    const repoName = repoUrl.trim().replace(/\/$/, "").split("/").pop() || repoId;
+    localStorage.setItem("current_repo_name", repoName);
+    router.push("/workspace");
+  };
+
   const handleIndex = async () => {
     if (!repoUrl.trim()) return;
     setError(null);
     setIsIndexing(true);
-    setStep(0);
-
-    const steps = [
-      "Connecting to backend...",
-      "Cloning repository...",
-      "Parsing AST nodes...",
-      "Building import graph...",
-      "Generating vector embeddings...",
-      "Finalizing index..."
-    ];
+    setStatusLabel("Connecting to backend...");
 
     try {
-      // Start the real indexing process
       const result = await indexRepository(repoUrl);
+      const repoId = result?.repository_id;
+      if (!repoId) throw new Error("Backend did not return a repository id.");
 
-      // Simulate visual progress steps (backend returns immediately since indexing is backgrounded)
-      let current = 0;
-      const interval = setInterval(() => {
-        if (current < steps.length - 1) {
-          current++;
-          setStep(current);
-        } else {
-          clearInterval(interval);
-          if (result && result.repository_id) {
-            localStorage.setItem("current_repo_id", result.repository_id);
-            // Store the repo name extracted from URL
-            const repoName = repoUrl.trim().replace(/\/$/, "").split("/").pop() || result.repository_id;
-            localStorage.setItem("current_repo_name", repoName);
+      // Poll real indexing status until ready/failed (max ~5 min).
+      const startedAt = Date.now();
+      const poll = setInterval(async () => {
+        try {
+          const status = await fetchIndexStatus(repoId);
+
+          if (status.status === "ready") {
+            clearInterval(poll);
+            if ((status.record_count ?? 0) === 0) {
+              setError(
+                "Indexed, but no code was found on the default branch (e.g. README-only repo).",
+              );
+              setIsIndexing(false);
+              return;
+            }
+            setStatusLabel("Finalizing index...");
+            goToWorkspace(repoId);
+          } else if (status.status === "failed") {
+            clearInterval(poll);
+            setError(status.error || "Indexing failed on the backend.");
+            setIsIndexing(false);
+          } else {
+            setStatusLabel(STAGE_LABELS[status.stage || "queued"] || "Indexing...");
           }
-          router.push("/workspace");
+        } catch {
+          /* transient network hiccup — keep polling */
         }
-      }, 800);
 
+        if (Date.now() - startedAt > 5 * 60 * 1000) {
+          clearInterval(poll);
+          setError("Indexing is taking unusually long. Check back later from the repo list.");
+          setIsIndexing(false);
+        }
+      }, 1500);
     } catch (err: any) {
       setError(err.message || "Failed to index repository. Make sure the backend is running.");
       setIsIndexing(false);
     }
   };
-
-  const steps = [
-    "Cloning repository...",
-    "Parsing AST nodes...",
-    "Building import graph...",
-    "Generating vector embeddings...",
-    "Finalizing index..."
-  ];
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -92,14 +105,14 @@ export default function Home() {
           <div className="space-y-6 pt-4">
             <div className="flex items-center gap-3 text-sm font-medium animate-pulse">
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span>{steps[step]}</span>
+              <span>{statusLabel}</span>
             </div>
             <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-accent transition-all duration-1000 ease-out"
-                style={{ width: `${((step + 1) / steps.length) * 100}%` }}
-              />
+              <div className="h-full w-1/3 bg-accent rounded-full animate-pulse" />
             </div>
+            <p className="text-[11px] text-muted/60 text-center">
+              Large repositories can take a minute or two. You&apos;ll be taken to the workspace automatically when ready.
+            </p>
             <div className="grid grid-cols-2 gap-2 text-[10px] uppercase tracking-widest text-muted">
               <div className="flex items-center gap-1.5">
                 <Search className="w-3 h-3" /> Search Index

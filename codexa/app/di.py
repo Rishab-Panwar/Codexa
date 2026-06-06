@@ -23,6 +23,7 @@ from codexa.services.retrieval.indexing import CodeIndexService
 from codexa.services.retrieval.sentence_transformer_embedder import (
     SentenceTransformerEmbeddingService,
 )
+from codexa.services.state.index_status import IndexStatusRegistry
 from codexa.services.state.repo_state_store import RepoStateStore
 from codexa.utils.config import AppConfig, load_config
 
@@ -109,6 +110,11 @@ def get_agent_orchestrator() -> AgentOrchestrator:
         memory_agent=memory_agent,
         memory_store=memory_store,
     )
+
+
+@lru_cache
+def get_index_status_registry() -> IndexStatusRegistry:
+    return IndexStatusRegistry()
 
 
 @lru_cache

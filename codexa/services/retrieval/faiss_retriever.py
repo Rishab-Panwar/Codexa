@@ -46,6 +46,10 @@ class FaissCodeRetriever(CodeRetriever):
                 results.append(repo_index.records[idx])
         return results
 
+    def record_count(self, repo_id: str) -> int:
+        repo_index = self._indexes.get(repo_id)
+        return len(repo_index.records) if repo_index else 0
+
     def _persist(self, repo_id: str) -> None:
         if not self._base_dir:
             return

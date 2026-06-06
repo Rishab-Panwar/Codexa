@@ -94,6 +94,21 @@ export async function indexRepository(repoUrl: string) {
     return response.json();
 }
 
+export interface IndexStatus {
+    repo_id: string;
+    status: "processing" | "ready" | "failed" | "not_found";
+    stage?: string;
+    file_count?: number;
+    record_count?: number;
+    error?: string;
+}
+
+export async function fetchIndexStatus(repoId: string): Promise<IndexStatus> {
+    const response = await fetch(`${BASE_URL}/analyze-repo/status/${repoId}`);
+    if (!response.ok) throw new Error("Failed to fetch index status");
+    return response.json();
+}
+
 export async function fetchFiles(repoId: string) {
     const response = await fetch(`${BASE_URL}/files`, {
         method: "POST",
