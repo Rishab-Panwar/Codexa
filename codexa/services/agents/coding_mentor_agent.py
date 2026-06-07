@@ -15,28 +15,35 @@ class CodingMentorAgent(Agent):
                     "system",
                     "You are a Senior Software Engineer and Mentor. "
                     "Use the provided code context to answer the user's request. "
+                    "Use the prior conversation to resolve follow-up references "
+                    "(e.g. 'it', 'that function', 'refactor it'). "
                     "Provide specific code examples and refactoring suggestions where appropriate. "
                     "Cite the file paths you are referencing.",
                 ),
                 (
                     "human",
-                    "Goal: {goal}\n\nExisting Code Context:\n{context}",
+                    "Prior conversation:\n{history}\n\nGoal: {goal}\n\nExisting Code Context:\n{context}",
                 ),
             ]
         )
 
-    def generate(self, goal: str, context: str) -> str:
+    def _inputs(self, goal: str, context: str, history: str) -> dict:
+        return {
+            "goal": goal,
+            "context": context if context.strip() else "No relevant code found in the repository index.",
+            "history": history if history.strip() else "No prior conversation.",
+        }
+
+    def generate(self, goal: str, context: str, history: str = "") -> str:
         """Single LLM call using pre-retrieved context (no internal retrieval)."""
-        context_str = context if context.strip() else "No relevant code found in the repository index."
         chain = self._prompt | self._llm
-        response = chain.invoke({"goal": goal, "context": context_str})
+        response = chain.invoke(self._inputs(goal, context, history))
         return response.content
 
-    def stream(self, goal: str, context: str):
+    def stream(self, goal: str, context: str, history: str = ""):
         """Stream the answer token-by-token using pre-retrieved context."""
-        context_str = context if context.strip() else "No relevant code found in the repository index."
         chain = self._prompt | self._llm
-        for chunk in chain.stream({"goal": goal, "context": context_str}):
+        for chunk in chain.stream(self._inputs(goal, context, history)):
             token = chunk.content if hasattr(chunk, "content") else str(chunk)
             if token:
                 yield token

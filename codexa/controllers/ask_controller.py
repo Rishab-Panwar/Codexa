@@ -119,8 +119,11 @@ async def ask_stream(
 
                 yield _sse({"type": "status", "content": "Streaming answer..."})
 
+                # Conversational memory: thread recent turns into the answer.
+                history_text = orchestrator.format_memory(request.history)
+
                 # Real token streaming from the LLM as it generates.
-                for token in orchestrator.stream_answer_fast(request.question, context):
+                for token in orchestrator.stream_answer_fast(request.question, context, history_text):
                     yield _sse({"type": "token", "content": token})
 
                 latency = (time.perf_counter() - start) * 1000

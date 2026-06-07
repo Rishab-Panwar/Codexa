@@ -99,9 +99,17 @@ class AgentOrchestrator:
             self._logger.warning("Retrieval failed: %s", e)
             return "", []
 
-    def stream_answer_fast(self, question: str, context: str):
-        """Yield answer tokens from the mentor using pre-retrieved context."""
-        return self._mentor_agent.stream(question, context)
+    def format_memory(self, history: list | None) -> str:
+        """Format recent chat turns into context (conversational memory)."""
+        try:
+            return self._memory_agent.format_history(history or [])
+        except Exception as e:
+            self._logger.warning("Memory formatting failed: %s", e)
+            return ""
+
+    def stream_answer_fast(self, question: str, context: str, history: str = ""):
+        """Yield answer tokens from the mentor using pre-retrieved context + memory."""
+        return self._mentor_agent.stream(question, context, history)
 
     def handle_generation(self, prompt: str, repo_id: str) -> GenerateResult:
         """Generate code or example usage grounded in repo context."""

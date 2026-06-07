@@ -15,15 +15,49 @@ interface Message {
 import { askQuestionStream } from "@/lib/api";
 import { pushRetrievedContext } from "@/components/Panels/ContextPanel";
 
+const DEFAULT_MESSAGES: Message[] = [
+    { role: "planner", content: "I've initialized the workspace. How can I help you today?" },
+];
+
+// Chat history is stored per repo, so each indexed repo has its own conversation.
+function chatKey(): string {
+    const id = (typeof window !== "undefined" && localStorage.getItem("current_repo_id")) || "general";
+    return `codexa_chat_${id}`;
+}
+
 export default function ChatWindow() {
-    const [messages, setMessages] = useState<Message[]>([
-        { role: "planner", content: "I've initialized the workspace. How can I help you today?" },
-    ]);
+    const [messages, setMessages] = useState<Message[]>(DEFAULT_MESSAGES);
     const [input, setInput] = useState("");
     const [isThinking, setIsThinking] = useState(false);
     const [streamStatus, setStreamStatus] = useState<string | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
+
+    // Load this repo's chat on mount, and reload when the user switches repos.
+    useEffect(() => {
+        const load = () => {
+            try {
+                const saved = localStorage.getItem(chatKey());
+                setMessages(saved ? JSON.parse(saved) : DEFAULT_MESSAGES);
+            } catch {
+                setMessages(DEFAULT_MESSAGES);
+            }
+        };
+        load();
+        window.addEventListener("codexa:repo-switched", load);
+        return () => window.removeEventListener("codexa:repo-switched", load);
+    }, []);
+
+    // Persist this repo's chat once a turn settles (skip mid-stream writes).
+    useEffect(() => {
+        if (!isThinking) {
+            try {
+                localStorage.setItem(chatKey(), JSON.stringify(messages));
+            } catch {
+                /* storage full / unavailable — ignore */
+            }
+        }
+    }, [messages, isThinking]);
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -66,6 +100,16 @@ export default function ChatWindow() {
         if (!input.trim() || isThinking) return;
 
         const userMsg = input.trim();
+
+        // Build conversational memory from prior turns (before adding this one).
+        const history = messages
+            .filter((m) => (m.role === "user" || m.role === "mentor") && m.content.trim())
+            .slice(-8)
+            .map((m) => ({
+                role: (m.role === "user" ? "user" : "assistant") as "user" | "assistant",
+                content: m.content,
+            }));
+
         setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
         setInput("");
         setIsThinking(true);
@@ -80,7 +124,6 @@ export default function ChatWindow() {
             const repoId = localStorage.getItem("current_repo_id") || undefined;
 
             // Add a placeholder message that will be updated as tokens arrive
-            const placeholderIdx = messages.length + 1; // +1 for user msg just added
             let streamedContent = "";
 
             setMessages((prev) => [
@@ -142,7 +185,7 @@ export default function ChatWindow() {
                         return updated;
                     });
                 },
-            });
+            }, history);
         } catch (err: any) {
             const errMsg =
                 typeof err === "string"
@@ -166,7 +209,7 @@ export default function ChatWindow() {
             setIsThinking(false);
             setStreamStatus(null);
         }
-    }, [input, isThinking, messages.length]);
+    }, [input, isThinking, messages]);
 
     return (
         <div className="flex flex-col h-full bg-background">

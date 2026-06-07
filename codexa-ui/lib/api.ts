@@ -17,6 +17,11 @@ export async function askQuestion(question: string, repoId?: string) {
     return response.json();
 }
 
+export interface ChatTurn {
+    role: "user" | "assistant";
+    content: string;
+}
+
 /** Stream an answer via SSE — calls back on each event type. */
 export async function askQuestionStream(
     question: string,
@@ -27,11 +32,12 @@ export async function askQuestionStream(
         onDone: (data: { citations: string[]; reasoning_steps: string[] }) => void;
         onError: (error: string) => void;
     },
+    history: ChatTurn[] = [],
 ) {
     const response = await fetch(`${BASE_URL}/ask/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, repo_id: repoId }),
+        body: JSON.stringify({ question, repo_id: repoId, history }),
     });
 
     if (!response.ok) {
