@@ -37,9 +37,9 @@ function MetricCard({
             <div className="flex items-center gap-2 mb-3">
                 <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: `${accent || "#800000"}1f` }}
+                    style={{ backgroundColor: `${accent || "#166534"}1f` }}
                 >
-                    <Icon className="w-4 h-4" style={{ color: accent || "#800000" }} />
+                    <Icon className="w-4 h-4" style={{ color: accent || "#166534" }} />
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-muted/60">
                     {label}
@@ -92,7 +92,7 @@ export default function EvalDashboard() {
     }, []);
 
     const agentColors: Record<string, string> = {
-        planner: "#800000",
+        planner: "#166534",
         retrieval: "#3B82F6",
         mentor: "#22D3EE",
         validator: "#10B981",
