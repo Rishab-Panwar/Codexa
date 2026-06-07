@@ -11,7 +11,6 @@ import {
     Check,
     MessageSquare,
     Code2,
-    BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import RepoTree from "./RepoTree";
@@ -196,8 +195,8 @@ export default function Sidebar() {
             <div className="flex flex-col h-full">
                 <div className="px-4 pt-6 pb-4 space-y-4">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-white/5 border border-border flex items-center justify-center">
-                            <Code2 className="w-4 h-4 text-accent" />
+                        <div className="w-8 h-8 rounded-lg brand-gradient flex items-center justify-center">
+                            <Code2 className="w-4 h-4 text-white" />
                         </div>
                         <div>
                             <div className="text-xs font-semibold text-foreground">Codexa AI</div>
@@ -229,14 +228,7 @@ export default function Sidebar() {
                     ))}
                 </div>
 
-                <div className="mt-auto px-4 py-4 border-t border-border space-y-3">
-                    <a
-                        href="/eval"
-                        className="w-full flex items-center gap-2 px-2 py-1.5 text-[10px] uppercase tracking-widest font-bold text-muted hover:text-accent hover:bg-white/5 rounded transition-colors"
-                    >
-                        <BarChart3 className="w-3.5 h-3.5" />
-                        Eval Dashboard
-                    </a>
+                <div className="mt-auto px-4 py-4 border-t border-border">
                     <p className="text-[10px] uppercase tracking-widest text-muted/40 text-center">
                         General Coding Assistant
                     </p>
@@ -356,17 +348,6 @@ export default function Sidebar() {
             <nav className="flex-1 overflow-y-auto">
                 <RepoTree key={treeKey} />
             </nav>
-
-            {/* Footer with eval link */}
-            <div className="px-3 py-3 border-t border-border flex-shrink-0">
-                <a
-                    href="/eval"
-                    className="w-full flex items-center gap-2 px-2 py-1.5 text-[10px] uppercase tracking-widest font-bold text-muted hover:text-accent hover:bg-white/5 rounded transition-colors"
-                >
-                    <BarChart3 className="w-3.5 h-3.5" />
-                    Eval Dashboard
-                </a>
-            </div>
         </div>
     );
 }

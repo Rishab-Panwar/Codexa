@@ -11,7 +11,6 @@ import KeyboardShortcutsHelp from "@/components/KeyboardShortcutsHelp";
 
 export default function WorkspacePage() {
     const [previewFile, setPreviewFile] = useState<string | null>(null);
-    const [sidebarVisible, setSidebarVisible] = useState(true);
 
     // Listen for file preview events from RepoTree and ContextPanel
     useEffect(() => {
@@ -23,18 +22,6 @@ export default function WorkspacePage() {
         return () => window.removeEventListener("codexa:preview-file", handler);
     }, []);
 
-    // Ctrl+B to toggle sidebar
-    useEffect(() => {
-        const handler = (e: KeyboardEvent) => {
-            if (e.ctrlKey && e.key === "b") {
-                e.preventDefault();
-                setSidebarVisible((v) => !v);
-            }
-        };
-        window.addEventListener("keydown", handler);
-        return () => window.removeEventListener("keydown", handler);
-    }, []);
-
     return (
         <>
             <WelcomeModal />
@@ -44,7 +31,7 @@ export default function WorkspacePage() {
                 onClose={() => setPreviewFile(null)}
             />
             <AppLayout
-                sidebar={sidebarVisible ? <Sidebar /> : null}
+                sidebar={<Sidebar />}
                 chat={<ChatWindow />}
                 panels={<ContextPanel />}
             />

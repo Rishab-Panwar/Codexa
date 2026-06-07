@@ -33,13 +33,13 @@ function MetricCard({
     accent?: string;
 }) {
     return (
-        <div className="p-5 bg-white/[0.03] border border-white/5 rounded-xl hover:border-white/10 transition-colors">
+        <div className="p-5 bg-card border border-border rounded-xl hover:border-accent/30 transition-colors">
             <div className="flex items-center gap-2 mb-3">
                 <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: `${accent || "#22D3EE"}15` }}
+                    style={{ backgroundColor: `${accent || "#8B5CF6"}1f` }}
                 >
-                    <Icon className="w-4 h-4" style={{ color: accent || "#22D3EE" }} />
+                    <Icon className="w-4 h-4" style={{ color: accent || "#8B5CF6" }} />
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-muted/60">
                     {label}
@@ -113,9 +113,11 @@ export default function EvalDashboard() {
                             <ArrowLeft className="w-3.5 h-3.5" />
                             Back
                         </Link>
-                        <div className="flex items-center gap-2">
-                            <BarChart3 className="w-5 h-5 text-accent" />
-                            <h1 className="text-lg font-bold tracking-tight">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg brand-gradient flex items-center justify-center">
+                                <BarChart3 className="w-4 h-4 text-white" />
+                            </div>
+                            <h1 className="text-lg font-bold tracking-tight brand-text">
                                 Evaluation Dashboard
                             </h1>
                         </div>

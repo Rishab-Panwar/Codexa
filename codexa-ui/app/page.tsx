@@ -110,14 +110,27 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm space-y-8">
-        <div className="space-y-2 text-center text-accent">
-          <div className="bg-white/5 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 border border-border">
-            <Code2 className="w-6 h-6" />
+    <div className="relative flex min-h-screen items-center justify-center bg-background px-4 overflow-hidden">
+      {/* ambient brand glow */}
+      <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 w-[480px] h-[480px] brand-gradient opacity-[0.12] blur-[120px] rounded-full" />
+
+      <div className="relative w-full max-w-md space-y-8">
+        <div className="space-y-2 text-center">
+          <div className="brand-gradient accent-glow w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Code2 className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight">Codexa AI</h1>
-          <p className="text-sm text-muted">Intelligent codebase indexing and assistance.</p>
+          <h1 className="text-3xl font-bold tracking-tight brand-text">Codexa</h1>
+          <p className="text-sm text-muted">Chat with any codebase — semantic search, grounded answers, and conversation memory.</p>
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-3">
+            {["Semantic RAG", "Conversational Memory", "Dependency Graph"].map((f) => (
+              <span
+                key={f}
+                className="text-[10px] text-muted/70 px-2.5 py-1 rounded-full border border-border bg-white/[0.03]"
+              >
+                {f}
+              </span>
+            ))}
+          </div>
         </div>
 
         {isIndexing ? (
@@ -163,7 +176,7 @@ export default function Home() {
             <button
               onClick={handleIndex}
               disabled={!repoUrl.trim()}
-              className="w-full bg-accent text-background rounded-md py-2.5 text-sm font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity mt-4 shadow-lg shadow-white/5 disabled:opacity-50"
+              className="w-full bg-accent text-white rounded-md py-2.5 text-sm font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity mt-4 accent-glow disabled:opacity-50"
             >
               Index Repository
               <ArrowRight className="w-4 h-4" />
@@ -226,7 +239,7 @@ export default function Home() {
 
         <div className="pt-8 border-t border-border text-center">
           <p className="text-[10px] uppercase tracking-widest text-muted/50">
-            Professional AI Developer Environment
+            Codexa · AI Codebase Intelligence
           </p>
         </div>
       </div>
