@@ -52,6 +52,18 @@ class SessionTracker:
                 self._agent_invocations[agent] += 1
                 self._agent_total_ms[agent] += latency_ms / max(len(agents_used), 1)
 
+    def clear_repo(self, repo_id: str) -> None:
+        """Drop all analytics for a repo (called when it's deleted) so the
+        dashboard no longer counts its queries. Recomputes agent aggregates."""
+        with self._lock:
+            self._records = [r for r in self._records if r.repo_id != repo_id]
+            self._agent_invocations = defaultdict(int)
+            self._agent_total_ms = defaultdict(float)
+            for record in self._records:
+                for agent in record.agents_used:
+                    self._agent_invocations[agent] += 1
+                    self._agent_total_ms[agent] += record.latency_ms / max(len(record.agents_used), 1)
+
     def get_stats(self) -> dict:
         with self._lock:
             records = list(self._records)

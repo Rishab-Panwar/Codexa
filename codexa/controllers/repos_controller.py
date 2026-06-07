@@ -9,6 +9,7 @@ from codexa.app.di import (
     get_index_status_registry,
     get_repo_state_store,
 )
+from codexa.observability.tracker import tracker
 from codexa.schemas.repos import ListReposResponse, RepoInfo
 from codexa.services.retrieval.faiss_retriever import FaissCodeRetriever
 from codexa.services.state.index_status import IndexStatusRegistry
@@ -80,6 +81,7 @@ def purge_repo(
     state_store.delete(repo_id)
     retriever.delete(repo_id)
     status_registry.clear(repo_id)
+    tracker.clear_repo(repo_id)
 
 
 @router.delete("/{repo_id}")
