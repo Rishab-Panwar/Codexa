@@ -8,7 +8,7 @@
 
 </div>
 
-> **Overview.** Index any public GitHub repo, then ask questions and get answers grounded in the actual code with `file:line` citations. It uses semantic RAG (Vertex AI embeddings + FAISS, not keyword or hash matching) with a lexical reranking step, a LangGraph agent pipeline (retrieval, memory, mentor), per-repo conversation memory, real-time token streaming, and a live evaluation dashboard (latency, agent utilization, per-repo stats). Built to make any unfamiliar codebase explorable in plain English.
+> Index any public GitHub repo, then ask questions and get answers grounded in the actual code with `file:line` citations. It uses semantic RAG (Vertex AI embeddings + FAISS, not keyword or hash matching) with a lexical reranking step, a LangGraph agent pipeline (retrieval, memory, mentor), per-repo conversation memory, real-time token streaming, and a live evaluation dashboard (latency, agent utilization, per-repo stats). Built to make any unfamiliar codebase explorable in plain English.
 
 <div align="center">
 
