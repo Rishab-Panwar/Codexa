@@ -6,8 +6,8 @@
 
   --color-sidebar: #0e0e10;
   --color-border: #232329;
-  --color-accent: #8b5cf6;       /* Codexa signature violet */
-  --color-accent-2: #6366f1;     /* indigo, for gradients */
+  --color-accent: #3b82f6;       /* Codexa signature electric blue */
+  --color-accent-2: #2563eb;     /* deeper blue, for gradients */
   --color-muted: #7d7d85;
   --color-card: #131316;
 
@@ -36,15 +36,15 @@ body {
 
   /* Codexa brand helpers */
   .brand-gradient {
-    background-image: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    background-image: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   }
   .brand-text {
-    background-image: linear-gradient(135deg, #a78bfa 0%, #818cf8 100%);
+    background-image: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
   .accent-glow {
-    box-shadow: 0 0 24px -6px rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 24px -6px rgba(59, 130, 246, 0.5);
   }
 }

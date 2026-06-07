@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Code2, PanelLeft, PanelRight, BarChart3, Home } from "lucide-react";
+import { Braces, PanelLeft, PanelRight, BarChart3, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TopBarProps {
@@ -32,7 +32,7 @@ export default function TopBar({ leftOpen, rightOpen, onToggleLeft, onToggleRigh
             <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-lg brand-gradient flex items-center justify-center">
-                        <Code2 className="w-4 h-4 text-white" />
+                        <Braces className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-sm font-semibold brand-text">Codexa</span>
                 </div>

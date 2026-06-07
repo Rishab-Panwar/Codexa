@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, ArrowRight, Loader2, Search, Database, Code2, FolderOpen, Trash2 } from "lucide-react";
+import { Github, ArrowRight, Loader2, Search, Database, Braces, FolderOpen, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -117,10 +117,9 @@ export default function Home() {
       <div className="relative w-full max-w-md space-y-8">
         <div className="space-y-2 text-center">
           <div className="brand-gradient accent-glow w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Code2 className="w-7 h-7 text-white" />
+            <Braces className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight brand-text">Codexa</h1>
-          <p className="text-sm text-muted">Chat with any codebase — semantic search, grounded answers, and conversation memory.</p>
           <div className="flex flex-wrap items-center justify-center gap-2 pt-3">
             {["Semantic RAG", "Conversational Memory", "Dependency Graph"].map((f) => (
               <span

@@ -10,7 +10,7 @@ import {
     FolderOpen,
     Check,
     MessageSquare,
-    Code2,
+    Braces,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import RepoTree from "./RepoTree";
@@ -196,7 +196,7 @@ export default function Sidebar() {
                 <div className="px-4 pt-6 pb-4 space-y-4">
                     <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-lg brand-gradient flex items-center justify-center">
-                            <Code2 className="w-4 h-4 text-white" />
+                            <Braces className="w-4 h-4 text-white" />
                         </div>
                         <div>
                             <div className="text-xs font-semibold text-foreground">Codexa AI</div>
