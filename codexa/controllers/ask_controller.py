@@ -145,12 +145,14 @@ async def ask_stream(
                     yield _sse({"type": "token", "content": token})
 
                 latency = (time.perf_counter() - start) * 1000
+                # Record memory only when prior turns were actually threaded in.
+                agents_used = ["retrieval", "memory", "mentor"] if history_text else ["retrieval", "mentor"]
                 tracker.record_query(
                     question=request.question,
                     repo_id=request.repo_id,
                     latency_ms=latency,
                     citation_count=len(citations),
-                    agents_used=["retrieval", "mentor"],
+                    agents_used=agents_used,
                 )
                 yield _sse(
                     {
