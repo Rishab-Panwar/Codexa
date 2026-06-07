@@ -279,7 +279,7 @@ export default function ChatWindow() {
                     <button
                         onClick={handleSend}
                         disabled={!input.trim() || isThinking}
-                        className="absolute bottom-3 right-3 p-1.5 bg-accent text-background rounded hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="absolute bottom-3 right-3 p-1.5 bg-accent text-white rounded hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Send className="w-4 h-4" />
                     </button>

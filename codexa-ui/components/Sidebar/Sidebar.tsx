@@ -304,7 +304,7 @@ export default function Sidebar() {
                             <button
                                 onClick={handleAddRepo}
                                 disabled={!newRepoUrl.trim() || isIndexing}
-                                className="flex-1 flex items-center justify-center gap-1 px-2 py-1 bg-accent text-background rounded text-[10px] font-bold hover:opacity-90 disabled:opacity-50"
+                                className="flex-1 flex items-center justify-center gap-1 px-2 py-1 bg-accent text-white rounded text-[10px] font-bold hover:opacity-90 disabled:opacity-50"
                             >
                                 {isIndexing ? (
                                     <><Loader2 className="w-3 h-3 animate-spin" /> {indexStage || "Indexing..."}</>

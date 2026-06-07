@@ -50,7 +50,7 @@ const FileIcon = ({ name, className }: { name: string; className?: string }) => 
     if (name.toLowerCase().includes("license"))
         return <Scale className={cn("w-3.5 h-3.5 text-yellow-400/80", className)} />;
     if (ext === "db" || ext === "sqlite")
-        return <Database className={cn("w-3.5 h-3.5 text-purple-400/80", className)} />;
+        return <Database className={cn("w-3.5 h-3.5 text-emerald-400/80", className)} />;
 
     return <FileCode className={cn("w-3.5 h-3.5 text-muted/60", className)} />;
 };
