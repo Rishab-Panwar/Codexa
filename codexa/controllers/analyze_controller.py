@@ -12,8 +12,10 @@ from codexa.app.di import (
     get_repo_state_store,
     get_repository_loader,
 )
+from codexa.controllers.repos_controller import purge_repo
 from codexa.schemas.analyze import AnalyzeRepoRequest, AnalyzeRepoResponse
 from codexa.services.dependency.interfaces import DependencyGraphBuilder
+from codexa.services.ingestion.git_loader import _normalize_repo_url
 from codexa.services.ingestion.interfaces import RepositoryLoader
 from codexa.services.parsing.interfaces import AstParser
 from codexa.services.retrieval.faiss_retriever import FaissCodeRetriever
@@ -73,7 +75,15 @@ def analyze_repo(
     index_service: CodeIndexService = Depends(get_index_service),
     state_store: RepoStateStore = Depends(get_repo_state_store),
     status_registry: IndexStatusRegistry = Depends(get_index_status_registry),
+    retriever: FaissCodeRetriever = Depends(get_code_retriever),
 ) -> AnalyzeRepoResponse:
+    # Dedup: if this URL was already indexed, remove the old copy first.
+    normalized = _normalize_repo_url(str(request.repo_url))
+    for existing_id in list(state_store.list_repo_ids()):
+        existing = state_store.get(existing_id)
+        if existing and existing.url and _normalize_repo_url(existing.url) == normalized:
+            purge_repo(existing_id, state_store, retriever, status_registry)
+
     repo_id = str(uuid.uuid4())
     status_registry.set(repo_id, "processing", stage="queued")
     background_tasks.add_task(

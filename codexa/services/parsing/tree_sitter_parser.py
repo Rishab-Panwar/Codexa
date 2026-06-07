@@ -10,6 +10,64 @@ from codexa.models.repository import Repository
 from codexa.models.source_file import SourceFile
 from codexa.services.parsing.interfaces import AstParser
 
+# Directories never worth indexing (vendored deps, VCS internals, build output).
+_IGNORE_DIRS = {
+    ".git",
+    "node_modules",
+    "__pycache__",
+    ".venv",
+    "venv",
+    ".pytest_cache",
+    "dist",
+    "build",
+    ".next",
+    ".idea",
+    ".vscode",
+    ".mypy_cache",
+    ".ruff_cache",
+}
+
+# Non-code text files worth indexing (docs, config, infra) — embedded whole-file.
+_TEXT_SUFFIX_MAP = {
+    ".md": "markdown",
+    ".markdown": "markdown",
+    ".rst": "rst",
+    ".txt": "text",
+    ".yaml": "yaml",
+    ".yml": "yaml",
+    ".json": "json",
+    ".toml": "toml",
+    ".ini": "ini",
+    ".cfg": "ini",
+    ".env": "dotenv",
+    ".sh": "bash",
+    ".bash": "bash",
+    ".sql": "sql",
+    ".xml": "xml",
+    ".html": "html",
+    ".css": "css",
+    ".scss": "css",
+    ".gradle": "gradle",
+    ".properties": "properties",
+}
+_TEXT_NAME_MAP = {
+    "dockerfile": "dockerfile",
+    "makefile": "makefile",
+    "caddyfile": "caddy",
+    "license": "text",
+    ".gitignore": "text",
+    ".dockerignore": "text",
+    ".env": "dotenv",
+    ".env.example": "dotenv",
+}
+
+
+def _text_language(path: Path) -> str | None:
+    suffix = path.suffix.lower()
+    if suffix in _TEXT_SUFFIX_MAP:
+        return _TEXT_SUFFIX_MAP[suffix]
+    return _TEXT_NAME_MAP.get(path.name.lower())
+
 
 class TreeSitterAstParser(AstParser):
     def parse_repository(self, repository: Repository) -> ParsedRepository:
@@ -20,18 +78,22 @@ class TreeSitterAstParser(AstParser):
         for path in root.rglob("*"):
             if not path.is_file():
                 continue
-            language = self._language_from_suffix(path.suffix)
-            if language is None:
+            if any(part in _IGNORE_DIRS for part in path.parts):
                 continue
-            file_functions = self._parse_file(path, language)
-            files.append(
-                SourceFile(
-                    path=str(path),
-                    language=language,
-                    size_bytes=path.stat().st_size,
-                )
-            )
-            functions.extend(file_functions)
+
+            code_language = self._SUFFIX_MAP.get(path.suffix)
+            if code_language is not None:
+                # Code file: extract functions for fine-grained retrieval.
+                file_functions = self._parse_file(path, code_language)
+                files.append(SourceFile(path=str(path), language=code_language, size_bytes=path.stat().st_size))
+                functions.extend(file_functions)
+                continue
+
+            text_language = _text_language(path)
+            if text_language is not None:
+                # Docs/config (README, yaml, Dockerfile, ...): indexed as a
+                # whole-file record (no functions) so they're searchable + visible.
+                files.append(SourceFile(path=str(path), language=text_language, size_bytes=path.stat().st_size))
 
         return ParsedRepository(
             repository_id=repository.repo_id,

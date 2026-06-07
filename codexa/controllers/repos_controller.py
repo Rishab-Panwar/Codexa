@@ -64,15 +64,14 @@ def list_repos(
     return ListReposResponse(repo_ids=repo_ids, repos=repos)
 
 
-@router.delete("/{repo_id}")
-def delete_repo(
+def purge_repo(
     repo_id: str,
-    state_store: RepoStateStore = Depends(get_repo_state_store),
-    retriever: FaissCodeRetriever = Depends(get_code_retriever),
-    status_registry: IndexStatusRegistry = Depends(get_index_status_registry),
-) -> dict:
+    state_store: RepoStateStore,
+    retriever: FaissCodeRetriever,
+    status_registry: IndexStatusRegistry,
+) -> None:
+    """Fully remove a repo: cloned files, FAISS index, state, and status."""
     state = state_store.get(repo_id)
-    # Remove cloned files (use stored root_path, fall back to default location).
     root_paths = {Path(".codexa/repos") / repo_id}
     if state and state.root_path:
         root_paths.add(Path(state.root_path))
@@ -81,4 +80,14 @@ def delete_repo(
     state_store.delete(repo_id)
     retriever.delete(repo_id)
     status_registry.clear(repo_id)
+
+
+@router.delete("/{repo_id}")
+def delete_repo(
+    repo_id: str,
+    state_store: RepoStateStore = Depends(get_repo_state_store),
+    retriever: FaissCodeRetriever = Depends(get_code_retriever),
+    status_registry: IndexStatusRegistry = Depends(get_index_status_registry),
+) -> dict:
+    purge_repo(repo_id, state_store, retriever, status_registry)
     return {"repo_id": repo_id, "deleted": True}

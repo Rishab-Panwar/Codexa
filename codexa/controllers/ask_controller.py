@@ -5,13 +5,27 @@ import time
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 
-from codexa.app.di import get_agent_orchestrator, get_llm_provider
+from codexa.app.di import get_agent_orchestrator, get_llm_provider, get_repo_state_store
 from codexa.observability.tracker import tracker
 from codexa.schemas.ask import AskRequest, AskResponse
 from codexa.services.agents.orchestration import AgentOrchestrator
 from codexa.services.llm.provider import LlmProvider
+from codexa.services.state.repo_state_store import RepoStateStore
 
 router = APIRouter(prefix="/ask", tags=["qa"])
+
+
+def _repo_header(state_store: RepoStateStore, repo_id: str) -> str:
+    """A short metadata header so the model can answer name/overview questions."""
+    state = state_store.get(repo_id)
+    if not state:
+        return ""
+    name = state.name or "(unknown)"
+    parts = [f"Repository name: {name}"]
+    if state.url:
+        parts.append(f"URL: {state.url}")
+    parts.append(f"Indexed files: {len(state.parsed_repo.files)}, functions: {len(state.parsed_repo.functions)}")
+    return "\n".join(parts) + "\n\n"
 
 
 # ---------- normal (non-streaming) endpoint ----------
@@ -64,6 +78,7 @@ async def ask_stream(
     request: AskRequest,
     orchestrator: AgentOrchestrator = Depends(get_agent_orchestrator),
     llm_provider: LlmProvider = Depends(get_llm_provider),
+    state_store: RepoStateStore = Depends(get_repo_state_store),
 ):
     async def generate():
         start = time.perf_counter()
@@ -118,6 +133,9 @@ async def ask_stream(
                 )
 
                 yield _sse({"type": "status", "content": "Streaming answer..."})
+
+                # Prepend repo metadata so name/overview questions are grounded.
+                context = _repo_header(state_store, request.repo_id) + context
 
                 # Conversational memory: thread recent turns into the answer.
                 history_text = orchestrator.format_memory(request.history)
