@@ -1,8 +1,36 @@
-# Codexa — Chat with any codebase
+<div align="center">
 
-Codexa indexes a public GitHub repository and lets you **chat with it** — ask how something works, where a feature lives, or what the architecture looks like, and get **grounded answers with `file:line` citations**, streamed in real time.
+<img src="docs/logo.svg" width="92" alt="Codexa logo" />
 
-> Semantic code search (RAG) + a conversational coding mentor, with per-repo conversation memory.
+# Codexa
+
+**Chat with any codebase** — semantic code search with grounded, cited answers.
+
+</div>
+
+> [!TIP]
+> Index any public GitHub repo, then ask questions and get answers grounded in the **actual code** with `file:line` citations.
+> Powered by **semantic RAG** (Vertex AI embeddings + FAISS — not keyword/hash matching), a **LangGraph** agent pipeline (retrieval → memory → mentor), per-repo **conversation memory**, and **real-time token streaming**.
+> Built to make any unfamiliar codebase explorable in plain English.
+
+<div align="center">
+
+[![Follow @Rishab-Panwar](https://img.shields.io/github/followers/Rishab-Panwar?style=social)](https://github.com/Rishab-Panwar) &nbsp; Follow **[@Rishab-Panwar](https://github.com/Rishab-Panwar)** on GitHub.
+
+</div>
+
+<div align="center">
+
+![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-async-009688?logo=fastapi&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)
+![LLM](https://img.shields.io/badge/LLM-Groq%20Llama--3.1-F55036)
+![Embeddings](https://img.shields.io/badge/embeddings-Vertex%20AI-4285F4?logo=googlecloud&logoColor=white)
+![Vector](https://img.shields.io/badge/vector-FAISS-0064FF)
+![License](https://img.shields.io/github/license/Rishab-Panwar/Codexa?color=brightgreen)
+![Stars](https://img.shields.io/github/stars/Rishab-Panwar/Codexa)
+
+</div>
 
 ---
 
