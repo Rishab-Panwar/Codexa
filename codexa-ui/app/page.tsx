@@ -32,6 +32,7 @@ export default function Home() {
     localStorage.setItem("current_repo_id", repoId);
     const repo = existingRepos.find((r) => r.repo_id === repoId);
     if (repo) localStorage.setItem("current_repo_name", repo.name);
+    sessionStorage.setItem("codexa_show_welcome", "1");
     router.push("/workspace");
   };
 
@@ -57,6 +58,7 @@ export default function Home() {
     localStorage.setItem("current_repo_id", repoId);
     const repoName = repoUrl.trim().replace(/\/$/, "").split("/").pop() || repoId;
     localStorage.setItem("current_repo_name", repoName);
+    sessionStorage.setItem("codexa_show_welcome", "1");
     router.push("/workspace");
   };
 
@@ -228,6 +230,7 @@ export default function Home() {
               onClick={() => {
                 localStorage.removeItem("current_repo_id");
                 localStorage.removeItem("current_repo_name");
+                sessionStorage.setItem("codexa_show_welcome", "1");
                 router.push("/workspace");
               }}
               className="w-full border border-border text-foreground/70 rounded-md py-2.5 text-sm font-medium flex items-center justify-center gap-2 hover:bg-white/5 transition-colors"

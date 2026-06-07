@@ -34,7 +34,12 @@ export default function WelcomeModal() {
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
-        setVisible(true);
+        // Only greet when arriving from the home page (it sets this flag).
+        // Internal navigation (e.g. back from Eval) won't, so no repeat popup.
+        if (sessionStorage.getItem("codexa_show_welcome") === "1") {
+            setVisible(true);
+            sessionStorage.removeItem("codexa_show_welcome");
+        }
     }, []);
 
     const dismiss = () => setVisible(false);
