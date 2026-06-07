@@ -44,6 +44,8 @@ export default function Sidebar() {
 
     const switchRepo = (repoId: string) => {
         localStorage.setItem("current_repo_id", repoId);
+        const repo = repos.find((r) => r.repo_id === repoId);
+        if (repo) localStorage.setItem("current_repo_name", repo.name);
         setActiveRepo(repoId);
         setDropdownOpen(false);
         setTreeKey((k) => k + 1);

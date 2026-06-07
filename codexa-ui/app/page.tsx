@@ -30,6 +30,8 @@ export default function Home() {
 
   const openExistingRepo = (repoId: string) => {
     localStorage.setItem("current_repo_id", repoId);
+    const repo = existingRepos.find((r) => r.repo_id === repoId);
+    if (repo) localStorage.setItem("current_repo_name", repo.name);
     router.push("/workspace");
   };
 

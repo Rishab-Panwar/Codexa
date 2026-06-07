@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Search, GitFork, MessageSquare, Lightbulb, Sparkles, ArrowRight } from "lucide-react";
+import { X, Search, GitFork, MessageSquare, Lightbulb, Braces, ArrowRight } from "lucide-react";
 
 const capabilities = [
     {
@@ -54,11 +54,11 @@ export default function WelcomeModal() {
                 <div className="relative flex items-center justify-between px-8 py-6 border-b border-border">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl brand-gradient accent-glow flex items-center justify-center">
-                            <Sparkles className="w-5 h-5 text-white" />
+                            <Braces className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-semibold tracking-tight">
-                                Welcome to <span className="brand-text">Codexa</span>
+                            <h2 className="text-lg font-semibold tracking-tight brand-text">
+                                Codexa
                             </h2>
                             <p className="text-[11px] text-muted mt-0.5">
                                 {hasRepo

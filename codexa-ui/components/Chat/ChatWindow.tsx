@@ -49,8 +49,10 @@ export default function ChatWindow() {
     }, []);
 
     // Persist this repo's chat once a turn settles (skip mid-stream writes).
+    // Never write the bare greeting — that would clobber a saved chat on mount
+    // (the load effect sets real messages a tick later).
     useEffect(() => {
-        if (!isThinking) {
+        if (!isThinking && messages.length > 1) {
             try {
                 localStorage.setItem(chatKey(), JSON.stringify(messages));
             } catch {

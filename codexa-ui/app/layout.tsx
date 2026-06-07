@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Codexa | AI Codebase Intelligence",
-  description: "Agentic codebase intelligence for master developers.",
+  title: "Codexa",
+  description: "Chat with any codebase — semantic search, grounded answers, and conversation memory.",
 };
 
 export default function RootLayout({
