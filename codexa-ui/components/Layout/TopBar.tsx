@@ -30,12 +30,16 @@ export default function TopBar({ leftOpen, rightOpen, onToggleLeft, onToggleRigh
         <header className="flex items-center justify-between h-12 px-3 border-b border-border bg-sidebar flex-shrink-0 z-20">
             {/* Brand + active repo */}
             <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
+                <Link
+                    href="/"
+                    title="Back to home"
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                >
                     <div className="w-7 h-7 rounded-lg brand-gradient flex items-center justify-center">
                         <Braces className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-sm font-semibold brand-text">Codexa</span>
-                </div>
+                </Link>
                 {repoName && (
                     <span className="text-[11px] mono text-muted px-2 py-1 bg-white/5 rounded border border-border truncate max-w-[220px]">
                         {repoName}
