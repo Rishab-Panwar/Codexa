@@ -4,17 +4,18 @@
 
 # Codexa
 
-**Chat with any codebase:** semantic code search with grounded, cited answers.
+**Chat with any codebase:** a multi-agent system for semantic code search with grounded, cited answers.
 
 </div>
 
-> Index any public GitHub repo, then ask questions and get answers grounded in the actual code with `file:line` citations. It uses semantic RAG (Vertex AI embeddings + FAISS, not keyword or hash matching) with a lexical reranking step, a LangGraph agent pipeline (retrieval, memory, mentor), per-repo conversation memory, real-time token streaming, and a live evaluation dashboard (latency, agent utilization, per-repo stats). Built to make any unfamiliar codebase explorable in plain English.
+> Index any public GitHub repo, then ask questions and get answers grounded in the actual code with `file:line` citations. Codexa is a multi-agent system: a LangGraph pipeline of specialized agents (retrieval, memory, mentor) on top of semantic RAG (Vertex AI embeddings + FAISS, not keyword or hash matching) with a lexical reranking step, per-repo conversation memory, real-time token streaming, and a live evaluation dashboard (latency, agent utilization, per-repo stats). Built to make any unfamiliar codebase explorable in plain English.
 
 <div align="center">
 
 ![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-async-009688?logo=fastapi&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)
+![Architecture](https://img.shields.io/badge/architecture-multi--agent-166534)
 ![LLM](https://img.shields.io/badge/LLM-Groq%20Llama--3.1-F55036)
 ![Embeddings](https://img.shields.io/badge/embeddings-Vertex%20AI-4285F4?logo=googlecloud&logoColor=white)
 ![Vector](https://img.shields.io/badge/vector-FAISS-0064FF)
