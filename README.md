@@ -12,14 +12,8 @@
 
 <div align="center">
 
-![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-async-009688?logo=fastapi&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)
-![Architecture](https://img.shields.io/badge/architecture-multi--agent-166534)
-![LLM](https://img.shields.io/badge/LLM-Groq%20Llama--3.1-F55036)
-![Embeddings](https://img.shields.io/badge/embeddings-Vertex%20AI-4285F4?logo=googlecloud&logoColor=white)
-![Vector](https://img.shields.io/badge/vector-FAISS-0064FF)
-![License](https://img.shields.io/github/license/Rishab-Panwar/Codexa?color=brightgreen)
+<img width="1918" height="908" alt="ezgif com-animated-gif-maker" src="https://github.com/user-attachments/assets/a46354e4-c7dd-4aa7-872f-bbc5de1e86bf" />
+
 
 </div>
 
