@@ -27,6 +27,7 @@ class LlmProvider:
                 api_key=os.getenv("GROQ_API_KEY"),
                 model=self._config.llm_model,
                 temperature=self._config.llm_temperature,
+                max_retries=6,
             )
         return FallbackChatModel()
 
