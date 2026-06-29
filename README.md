@@ -12,12 +12,12 @@
 
 <div align="center">
 
-<img width="1918" height="908" alt="ezgif com-animated-gif-maker" src="https://github.com/user-attachments/assets/a46354e4-c7dd-4aa7-872f-bbc5de1e86bf" />
-
 
 </div>
 
 ---
+<img width="1918" height="908" alt="ezgif com-animated-gif-maker" src="https://github.com/user-attachments/assets/f33177ee-5a7e-426f-b558-ad1ef402d405" />
+
 
 ## Features
 
@@ -34,15 +34,6 @@
 - **Pluggable LLM:** Groq (Llama-3.1-8B) by default through an OpenAI-compatible client, swappable with env vars.
 
 ---
-<img width="1918" height="908" alt="Screenshot 2026-06-29 170922" src="https://github.com/user-attachments/assets/02428a20-e507-4928-8c72-939950063d2c" />
-<img width="1910" height="908" alt="Screenshot 2026-06-29 171000" src="https://github.com/user-attachments/assets/84b07b37-ea85-4102-836d-9be25c385121" />
-<img width="1918" height="899" alt="Screenshot 2026-06-29 181639" src="https://github.com/user-attachments/assets/ff488242-c16c-46d9-a249-b249539e4a3c" />
-<img width="1911" height="908" alt="Screenshot 2026-06-29 181711" src="https://github.com/user-attachments/assets/fabeff9d-f211-4545-8602-1362487ec687" />
-<img width="1787" height="900" alt="Screenshot 2026-06-29 181751" src="https://github.com/user-attachments/assets/437bf51b-0b62-4ca1-8519-480be50ea596" />
-
-
-
-
 
 
 ## How it works
